@@ -23,7 +23,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={`site-nav ${isScrolled ? "is-scrolled" : ""}`}>
+    <header className={`site-nav z-[999] ${isScrolled ? "is-scrolled" : ""}`}>
       <div className="nav-inner">
         <Link to="hero" smooth duration={500} className="brand-mark" onClick={() => setIsOpen(false)}>
           <span>K</span>
