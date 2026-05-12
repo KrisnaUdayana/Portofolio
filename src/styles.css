@@ -76,7 +76,7 @@ h3 {
 }
 
 h1 {
-  max-width: 840px;
+  max-width: none;
   font-size: 70px;
   font-weight: 700;
 }

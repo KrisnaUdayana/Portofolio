@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
 import Matter from "matter-js";
+import { FiGithub, FiLinkedin, FiInstagram, FiArrowDown, FiDownload, FiExternalLink } from "react-icons/fi";
+import { Link } from "react-scroll";
 
 const YOUR_NAME = "KRISNA UDAYANA";
+const YOUR_TAGLINE = "Building digital experiences with clean code & creative design";
 
 const floatingTags = [
   { label: "SISTEM INFORMASI",     top: "15%", left: "10%", rotate: 0  },
@@ -216,23 +219,27 @@ export default function Hero() {
       const H = heroRect.height;
 
       const nameRect = nameEl.getBoundingClientRect();
-      const floorY   = nameRect.top - heroRect.top - 4;
-      stateRef.current.floorY = floorY;
+      // Floor surface = top edge of the name text (tags rest ON the name)
+      const floorSurface = nameRect.top - heroRect.top;
+      // Floor body center is offset by half its thickness (10px)
+      const floorY = floorSurface - 10;
+      stateRef.current.floorY = floorSurface;
 
       // ── Physics ────────────────────────────────────────────
       const engine = Engine.create({
         gravity:            { y: 2.2 },
-        positionIterations: 10,
-        velocityIterations: 8,
+        positionIterations: 12,
+        velocityIterations: 10,
       });
       stateRef.current.engine = engine;
       const world = engine.world;
 
+      const WALL = 50;
       const floorBody = Bodies.rectangle(W / 2, floorY, W * 3, 20, { isStatic: true, label: "floor" });
       World.add(world, [
-        Bodies.rectangle(-25,    H / 2, 50,    H * 3, { isStatic: true, label: "wall" }),
-        Bodies.rectangle(W + 25, H / 2, 50,    H * 3, { isStatic: true, label: "wall" }),
-        Bodies.rectangle(W / 2,  -25,   W * 3, 50,    { isStatic: true, label: "ceiling" }),
+        Bodies.rectangle(-WALL / 2,     H / 2, WALL, H * 3, { isStatic: true, label: "wall" }),
+        Bodies.rectangle(W + WALL / 2,  H / 2, WALL, H * 3, { isStatic: true, label: "wall" }),
+        Bodies.rectangle(W / 2, -WALL / 2, W * 3, WALL,     { isStatic: true, label: "ceiling" }),
         floorBody,
       ]);
 
@@ -277,7 +284,9 @@ export default function Hero() {
         floatingTags.forEach((t) => {
           const { w, h } = measureTag(t.label, t.icon, hero);
           const startX = W * (parseFloat(t.left) / 100) + w / 2;
-          const startY = H * (parseFloat(t.top)  / 100) + h / 2;
+          // Spawn within the area ABOVE the floor (name text), not based on full hero height
+          const maxSpawnY = floorSurface - h;
+          const startY = Math.min(maxSpawnY * (parseFloat(t.top) / 50), maxSpawnY);
 
           const body = Bodies.rectangle(
             startX, startY,
@@ -439,7 +448,7 @@ export default function Hero() {
     <section
       id="hero"
       ref={heroRef}
-      className="relative min-h-screen w-full overflow-hidden bg-white flex items-center justify-center pt-[100px]"
+      className="relative min-h-screen w-full overflow-hidden bg-white flex flex-col items-center justify-center pt-[100px] pb-16"
     >
       {/* Grid background */}
       <div
@@ -459,14 +468,61 @@ export default function Hero() {
       />
 
       {/* Name — lantai fisika */}
-      <div className="relative z-10 w-full flex justify-center items-center pointer-events-none px-4">
+      <div className="relative z-10 w-full flex justify-center items-center pointer-events-none overflow-hidden">
         <h1
           ref={nameRef}
-          className="text-black font-black leading-[0.8] tracking-tighter whitespace-nowrap"
-          style={{ fontSize: "clamp(18px, 8vw, 120px)" }}
+          className="text-black font-black leading-[0.85] tracking-tighter whitespace-nowrap w-full text-center select-none"
+          style={{ fontSize: "clamp(40px, 12.5vw, 260px)", maxWidth: "none", letterSpacing: "-0.02em" }}
         >
           {YOUR_NAME}
         </h1>
+      </div>
+
+      {/* Info section — below name, above tags */}
+      <div className="relative z-30 mt-8 flex flex-col items-center gap-5 px-4">
+        <p className="text-gray-500 text-center text-lg md:text-xl font-medium max-w-md">
+          {YOUR_TAGLINE}
+        </p>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="projects"
+            smooth
+            duration={500}
+            offset={-72}
+            className="inline-flex items-center gap-2 px-7 py-3 border-[3px] border-black rounded-full bg-black text-white font-extrabold text-sm shadow-[4px_4px_0_#111] hover:shadow-[6px_6px_0_#111] hover:-translate-y-1 transition-all cursor-pointer"
+          >
+            View Projects
+            <FiExternalLink size={15} />
+          </Link>
+          <a
+            href="#"
+            className="inline-flex items-center gap-2 px-7 py-3 border-[3px] border-black rounded-full bg-white text-black font-extrabold text-sm shadow-[4px_4px_0_#111] hover:shadow-[6px_6px_0_#111] hover:-translate-y-1 transition-all"
+          >
+            <FiDownload size={15} />
+            Download CV
+          </a>
+        </div>
+
+        {/* Social Links */}
+        <div className="flex items-center gap-3">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 flex items-center justify-center border-[3px] border-black rounded-full bg-white text-black hover:bg-black hover:text-white transition-all shadow-[3px_3px_0_#111] hover:shadow-[4px_4px_0_#111] hover:-translate-y-0.5">
+            <FiGithub size={18} />
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 flex items-center justify-center border-[3px] border-black rounded-full bg-white text-black hover:bg-black hover:text-white transition-all shadow-[3px_3px_0_#111] hover:shadow-[4px_4px_0_#111] hover:-translate-y-0.5">
+            <FiLinkedin size={18} />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 flex items-center justify-center border-[3px] border-black rounded-full bg-white text-black hover:bg-black hover:text-white transition-all shadow-[3px_3px_0_#111] hover:shadow-[4px_4px_0_#111] hover:-translate-y-0.5">
+            <FiInstagram size={18} />
+          </a>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 pointer-events-none animate-bounce">
+        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Scroll</span>
+        <FiArrowDown size={16} className="text-gray-400" />
       </div>
 
       {/* Reset button */}
