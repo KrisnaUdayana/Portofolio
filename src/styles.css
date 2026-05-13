@@ -2103,3 +2103,164 @@ p {
     font-size: 28px;
   }
 }
+
+/* ── Pet Characters ───────────────────────────────────── */
+.pet-character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.pet-body {
+  position: relative;
+  animation: pet-idle 2s ease-in-out infinite alternate;
+}
+
+.pet-character.walking .pet-body {
+  animation: pet-walk 1.2s ease-in-out infinite alternate;
+}
+
+/* Walking animation — very gentle sway */
+@keyframes pet-walk {
+  0% {
+    transform: translateY(0) rotate(-0.8deg);
+  }
+  100% {
+    transform: translateY(-1.5px) rotate(0.8deg);
+  }
+}
+
+@keyframes pet-idle {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Arm swing — slow and gentle */
+.pet-arm-left {
+  animation: arm-swing-left 0.8s ease-in-out infinite alternate;
+  transform-origin: right center;
+}
+
+.pet-arm-right {
+  animation: arm-swing-right 0.8s ease-in-out infinite alternate;
+  transform-origin: left center;
+}
+
+@keyframes arm-swing-left {
+  0% { transform: rotate(-6deg); }
+  100% { transform: rotate(6deg); }
+}
+
+@keyframes arm-swing-right {
+  0% { transform: rotate(6deg); }
+  100% { transform: rotate(-6deg); }
+}
+
+/* Leg swing — slow and subtle */
+.pet-leg-left {
+  animation: leg-left 0.8s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+.pet-leg-right {
+  animation: leg-right 0.8s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+@keyframes leg-left {
+  0% { transform: rotate(-4deg); }
+  100% { transform: rotate(4deg); }
+}
+
+@keyframes leg-right {
+  0% { transform: rotate(4deg); }
+  100% { transform: rotate(-4deg); }
+}
+
+/* Speech bubble */
+.pet-speech-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 14px;
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #111;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: "Space Grotesk", "Inter", sans-serif;
+  border: 2.5px solid #111;
+  border-radius: 14px;
+  white-space: nowrap;
+  box-shadow: 4px 5px 0 #111;
+  animation: bubble-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pet-speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #111;
+}
+
+.pet-speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #ffffff;
+  z-index: 1;
+}
+
+@keyframes bubble-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Name tag */
+.pet-name {
+  margin-top: 4px;
+  padding: 3px 10px;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  font-family: "Space Grotesk", "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Hide pets on very small screens */
+@media (max-width: 640px) {
+  .pet-character {
+    transform: scale(0.8);
+  }
+}

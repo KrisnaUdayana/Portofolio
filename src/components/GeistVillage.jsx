@@ -417,7 +417,7 @@ export default function GeistVillage() {
   }, []);
 
   return (
-    <section className="py-20 relative bg-dark-100/50 backdrop-blur-sm z-10">
+    <section className="relative min-h-screen w-full py-20 relative bg-dark-100/50 backdrop-blur-sm z-10">
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-space font-bold mb-8 text-light-100 flex items-center gap-4">
           <span className="w-12 h-[2px] bg-primary-500"></span>

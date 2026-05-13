@@ -4,10 +4,10 @@ import { useInView } from "react-intersection-observer";
 import { FiGithub, FiLinkedin, FiMail, FiMapPin, FiPhone, FiSend, FiArrowRight } from "react-icons/fi";
 
 const contactItems = [
-  { icon: FiMail, label: "Email", value: "krisna@example.com", href: "mailto:krisna@example.com", color: "bg-blue-100 text-blue-600" },
+  { icon: FiMail, label: "Email", value: "krisnaudayana18@gmail.com", href: "mailto:krisnaudayana18@gmail.com", color: "bg-blue-100 text-blue-600" },
   { icon: FiLinkedin, label: "LinkedIn", value: "linkedin.com/in/krisna", href: "https://linkedin.com/in/krisna", color: "bg-blue-100 text-blue-700" },
-  { icon: FiGithub, label: "GitHub", value: "github.com/krisna", href: "https://github.com/krisna", color: "bg-gray-200 text-gray-800" },
-  { icon: FiPhone, label: "Phone", value: "+1 (555) 123-4567", href: "tel:+15551234567", color: "bg-green-100 text-green-600" },
+  { icon: FiGithub, label: "GitHub", value: "github.com/KrisnaUdayana", href: "https://github.com/KrisnaUdayana", color: "bg-gray-200 text-gray-800" },
+  { icon: FiPhone, label: "Phone", value: "+12345678", href: "tel:+12345678", color: "bg-green-100 text-green-600" },
 ];
 
 export default function Contact() {
