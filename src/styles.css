@@ -2122,6 +2122,29 @@ p {
   animation: pet-walk 1.2s ease-in-out infinite alternate;
 }
 
+.pet-character.running .pet-body {
+  animation: pet-run 0.15s ease-in-out infinite alternate;
+}
+
+/* Panic eye vibration */
+.panic-eyes {
+  animation: panic-shake 0.05s infinite alternate;
+}
+
+@keyframes panic-shake {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(1px, -1px); }
+}
+
+@keyframes pet-run {
+  0% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  100% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+
 /* Walking animation — very gentle sway */
 @keyframes pet-walk {
   0% {
@@ -2181,6 +2204,29 @@ p {
 @keyframes leg-right {
   0% { transform: rotate(4deg); }
   100% { transform: rotate(-4deg); }
+}
+
+/* Running overrides for limbs */
+.pet-character.running .pet-arm-left {
+  animation: arm-swing-left 0.15s ease-in-out infinite alternate;
+}
+.pet-character.running .pet-arm-right {
+  animation: arm-swing-right 0.15s ease-in-out infinite alternate;
+}
+.pet-character.running .pet-leg-left {
+  animation: leg-run-left 0.15s ease-in-out infinite alternate;
+}
+.pet-character.running .pet-leg-right {
+  animation: leg-run-right 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes leg-run-left {
+  0% { transform: rotate(-25deg); }
+  100% { transform: rotate(25deg); }
+}
+@keyframes leg-run-right {
+  0% { transform: rotate(25deg); }
+  100% { transform: rotate(-25deg); }
 }
 
 /* Speech bubble */

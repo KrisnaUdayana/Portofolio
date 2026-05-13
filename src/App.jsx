@@ -4,7 +4,6 @@ import About from "./components/About";
 import Projects from "./components/Projects";
 // import Testimonials from "./components/Testimonials";
 import Contact from "./components/Contact";
-import GeistVillage from "./components/GeistVillage";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import CursorGlow from "./components/CursorGlow";
@@ -21,7 +20,6 @@ export default function App() {
         <About />
         <Projects />
         {/* <Testimonials /> */}
-        <GeistVillage />
         <Contact />
       </main>
 

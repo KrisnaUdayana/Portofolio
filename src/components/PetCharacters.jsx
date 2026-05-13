@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // ── Phrases the pets can say ─────────────────────────────
 const PHRASES = [
@@ -14,42 +14,67 @@ const PHRASES = [
   "Let's build! 🔨",
 ];
 
-// ── Character SVG sprites ────────────────────────────────
-function CharacterSprite({ color, flipped }) {
+// ── Geist SVG Sprite ─────────────────────────────────────
+function GeistSprite({ flipped, isFleeing }) {
   return (
     <svg
-      width="48"
-      height="60"
-      viewBox="0 0 32 40"
-      fill="none"
-      style={{ transform: flipped ? "scaleX(-1)" : "none" }}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 100 100"
+      width="64"
+      style={{ transform: flipped ? "scaleX(-1)" : "none", display: "block" }}
     >
-      {/* Head */}
-      <rect x="8" y="0" width="16" height="16" rx="6" fill={color} />
-      {/* Eyes */}
-      <circle cx="13" cy="8" r="2" fill="#fff" />
-      <circle cx="19" cy="8" r="2" fill="#fff" />
-      <circle cx="13.5" cy="8.5" r="1" fill="#111" />
-      <circle cx="19.5" cy="8.5" r="1" fill="#111" />
-      {/* Mouth */}
-      <path d="M13 12 Q16 15 19 12" stroke="#111" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-      {/* Body */}
-      <rect x="10" y="16" width="12" height="12" rx="4" fill={color} />
       {/* Arms */}
-      <rect x="4" y="18" width="6" height="4" rx="2" fill={color} className="pet-arm-left" />
-      <rect x="22" y="18" width="6" height="4" rx="2" fill={color} className="pet-arm-right" />
+      <g className="pet-arm-left" style={{ transformOrigin: "28px 50px" }}>
+        <rect x="2" y="45" width="26" height="10" rx="5" fill="#111" />
+      </g>
+      <g className="pet-arm-right" style={{ transformOrigin: "72px 50px" }}>
+        <rect x="72" y="45" width="26" height="10" rx="5" fill="#111" />
+      </g>
+      
       {/* Legs */}
-      <rect x="11" y="28" width="4" height="10" rx="2" fill={color} className="pet-leg-left" />
-      <rect x="17" y="28" width="4" height="10" rx="2" fill={color} className="pet-leg-right" />
-      {/* Shoes */}
-      <rect x="9" y="35" width="7" height="5" rx="2.5" fill="#111" />
-      <rect x="16" y="35" width="7" height="5" rx="2.5" fill="#111" />
+      <g className="pet-leg-left" style={{ transformOrigin: "36px 70px" }}>
+        <rect x="30" y="70" width="12" height="24" rx="6" fill="#111" />
+      </g>
+      <g className="pet-leg-right" style={{ transformOrigin: "64px 70px" }}>
+        <rect x="58" y="70" width="12" height="24" rx="6" fill="#111" />
+      </g>
+
+      {/* Brackets */}
+      <text x="2" y="62" fontSize="28" fill="#666" fontFamily="monospace" fontWeight="bold">{"{"}</text>
+      <text x="82" y="62" fontSize="28" fill="#666" fontFamily="monospace" fontWeight="bold">{"}"}</text>
+
+      {/* Body */}
+      <rect x="15" y="15" width="70" height="70" rx="16" fill="#111" />
+
+      {/* Top Dots */}
+      <circle cx="32" cy="28" r="5" fill="#ef4444" />
+      <circle cx="50" cy="28" r="5" fill="#f59e0b" />
+      <circle cx="68" cy="28" r="5" fill="#22c55e" />
+
+      {/* Eyes */}
+      {!isFleeing ? (
+        <g>
+          <rect x="28" y="44" width="14" height="14" rx="4" fill="#fff" />
+          <rect x="58" y="44" width="14" height="14" rx="4" fill="#fff" />
+        </g>
+      ) : (
+        <g className="panic-eyes">
+          {/* Wide panic eyes */}
+          <rect x="26" y="42" width="18" height="18" rx="6" fill="#fff" />
+          <rect x="56" y="42" width="18" height="18" rx="6" fill="#fff" />
+          {/* Tiny pupils looking back (left relative to SVG) */}
+          <circle cx="29" cy="51" r="2.5" fill="#111" />
+          <circle cx="59" cy="51" r="2.5" fill="#111" />
+          {/* Sweat drop */}
+          <path d="M 80 30 Q 84 38 80 42 Q 76 38 80 30" fill="#60a5fa" className="sweat-drop" />
+        </g>
+      )}
     </svg>
   );
 }
 
 // ── Single Pet Component ─────────────────────────────────
-function Pet({ color, initialX, name, mousePos }) {
+function Pet({ initialX, name, mousePos }) {
   const petRef = useRef(null);
   const stateRef = useRef({
     x: initialX,
@@ -62,6 +87,7 @@ function Pet({ color, initialX, name, mousePos }) {
 
   const [pos, setPos] = useState({ x: initialX });
   const [direction, setDirection] = useState(1);
+  const [isFleeing, setIsFleeing] = useState(false);
   const [phrase, setPhrase] = useState(null);
   const [isWalking, setIsWalking] = useState(true);
   const phraseTimeout = useRef(null);
@@ -77,7 +103,6 @@ function Pet({ color, initialX, name, mousePos }) {
     };
 
     const interval = setInterval(showPhrase, 4000 + Math.random() * 6000);
-    // Initial phrase delay
     const initialDelay = setTimeout(showPhrase, 1500 + Math.random() * 3000);
 
     return () => {
@@ -89,18 +114,17 @@ function Pet({ color, initialX, name, mousePos }) {
 
   // Main animation loop
   useEffect(() => {
-    const FLEE_DISTANCE = 180;
+    const FLEE_DISTANCE = 150;
     const FLEE_SPEED = 3.5;
     const WALK_SPEED = 0.35;
-    const PET_WIDTH = 72;
-    const BOTTOM_OFFSET = 42;
-    const LERP = 0.04; // smoothing factor — lower = smoother
+    const PET_WIDTH = 64;
+    const BOTTOM_OFFSET = 38;
+    const LERP = 0.04;
 
     const animate = () => {
       const s = stateRef.current;
       const screenW = window.innerWidth;
 
-      // Check cursor distance
       const mx = mousePos.current.x;
       const my = mousePos.current.y;
       const petCenterX = s.x + PET_WIDTH / 2;
@@ -108,7 +132,6 @@ function Pet({ color, initialX, name, mousePos }) {
       const dist = Math.sqrt((mx - petCenterX) ** 2 + (my - petCenterY) ** 2);
 
       if (dist < FLEE_DISTANCE) {
-        // Flee from cursor — set target velocity
         s.isFleeing = true;
         s.fleeTimer = 60;
         const fleeDir = petCenterX > mx ? 1 : -1;
@@ -123,13 +146,9 @@ function Pet({ color, initialX, name, mousePos }) {
         s.targetVx = s.direction * WALK_SPEED;
       }
 
-      // Smooth velocity towards target (lerp)
       s.vx += (s.targetVx - s.vx) * (s.isFleeing ? 0.12 : LERP);
-
-      // Update position
       s.x += s.vx;
 
-      // Bounce off walls
       if (s.x <= 10) {
         s.x = 10;
         s.direction = 1;
@@ -140,12 +159,12 @@ function Pet({ color, initialX, name, mousePos }) {
         s.targetVx = -WALK_SPEED;
       }
 
-      // Determine facing direction
       const facing = s.vx >= 0 ? 1 : -1;
 
       setPos({ x: s.x });
       setDirection(facing);
       setIsWalking(true);
+      setIsFleeing(s.isFleeing);
 
       animRef.current = requestAnimationFrame(animate);
     };
@@ -159,10 +178,10 @@ function Pet({ color, initialX, name, mousePos }) {
   return (
     <div
       ref={petRef}
-      className={`pet-character ${isWalking ? "walking" : ""}`}
+      className={`pet-character ${isWalking ? "walking" : ""} ${isFleeing ? "running" : ""}`}
       style={{
         position: "fixed",
-        bottom: "42px",
+        bottom: "24px",
         left: `${pos.x}px`,
         zIndex: 9999,
         pointerEvents: "none",
@@ -177,7 +196,7 @@ function Pet({ color, initialX, name, mousePos }) {
 
       {/* Character body */}
       <div className="pet-body">
-        <CharacterSprite color={color} flipped={direction === -1} />
+        <GeistSprite flipped={direction === -1} isFleeing={isFleeing} />
       </div>
 
       {/* Name tag */}
@@ -201,15 +220,13 @@ export default function PetCharacters() {
   return (
     <>
       <Pet
-        color="#0d7f73"
         initialX={100}
-        name="Kris"
+        name="Krisna"
         mousePos={mousePos}
       />
       <Pet
-        color="#d49a20"
         initialX={window.innerWidth - 200}
-        name="Luna"
+        name="Udayana"
         mousePos={mousePos}
       />
     </>
