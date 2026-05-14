@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue } from "framer-motion";
 
 // ── Phrases the pets can say ─────────────────────────────
 const PHRASES = [
   "Hello! 👋",
   "Love you! 💖",
-  "Scroll down ↓",
+  "Wheee! 🎈",
   "Hire me! 🚀",
-  "Nice cursor!",
-  "Hi there! ✨",
+  "I can fly! ✨",
+  "Ouch! 🤕",
   "Keep going! 💪",
   "Check my work!",
   "Welcome! 🎉",
@@ -15,7 +16,7 @@ const PHRASES = [
 ];
 
 // ── Geist SVG Sprite ─────────────────────────────────────
-function GeistSprite({ flipped, isFleeing }) {
+function GeistSprite({ flipped, isPanicked }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +53,7 @@ function GeistSprite({ flipped, isFleeing }) {
       <circle cx="68" cy="28" r="5" fill="#22c55e" />
 
       {/* Eyes */}
-      {!isFleeing ? (
+      {!isPanicked ? (
         <g>
           <rect x="28" y="44" width="14" height="14" rx="4" fill="#fff" />
           <rect x="58" y="44" width="14" height="14" rx="4" fill="#fff" />
@@ -62,9 +63,9 @@ function GeistSprite({ flipped, isFleeing }) {
           {/* Wide panic eyes */}
           <rect x="26" y="42" width="18" height="18" rx="6" fill="#fff" />
           <rect x="56" y="42" width="18" height="18" rx="6" fill="#fff" />
-          {/* Tiny pupils looking back (left relative to SVG) */}
-          <circle cx="29" cy="51" r="2.5" fill="#111" />
-          <circle cx="59" cy="51" r="2.5" fill="#111" />
+          {/* Tiny pupils looking straight DOWN */}
+          <circle cx="35" cy="55" r="3" fill="#111" />
+          <circle cx="65" cy="55" r="3" fill="#111" />
           {/* Sweat drop */}
           <path d="M 80 30 Q 84 38 80 42 Q 76 38 80 30" fill="#60a5fa" className="sweat-drop" />
         </g>
@@ -74,22 +75,25 @@ function GeistSprite({ flipped, isFleeing }) {
 }
 
 // ── Single Pet Component ─────────────────────────────────
-function Pet({ initialX, name, mousePos }) {
+function Pet({ initialX, name }) {
   const petRef = useRef(null);
+  
+  const x = useMotionValue(initialX);
+  const y = useMotionValue(0);
+
   const stateRef = useRef({
-    x: initialX,
     vx: (Math.random() > 0.5 ? 1 : -1) * (0.3 + Math.random() * 0.3),
     targetVx: 0,
     direction: 1,
-    isFleeing: false,
-    fleeTimer: 0,
+    vy: 0, // For gravity
   });
 
-  const [pos, setPos] = useState({ x: initialX });
   const [direction, setDirection] = useState(1);
-  const [isFleeing, setIsFleeing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [phrase, setPhrase] = useState(null);
   const [isWalking, setIsWalking] = useState(true);
+  
+  const isDraggingRef = useRef(false);
   const phraseTimeout = useRef(null);
   const animRef = useRef(null);
 
@@ -112,59 +116,81 @@ function Pet({ initialX, name, mousePos }) {
     };
   }, []);
 
+  const triggerPhrase = (msg) => {
+    setPhrase(msg);
+    if (phraseTimeout.current) clearTimeout(phraseTimeout.current);
+    phraseTimeout.current = setTimeout(() => setPhrase(null), 2500);
+  };
+
   // Main animation loop
   useEffect(() => {
-    const FLEE_DISTANCE = 150;
-    const FLEE_SPEED = 3.5;
     const WALK_SPEED = 0.35;
     const PET_WIDTH = 64;
-    const BOTTOM_OFFSET = 38;
     const LERP = 0.04;
+    const GRAVITY = 0.6;
+    const BOUNCE = -0.4;
 
     const animate = () => {
       const s = stateRef.current;
       const screenW = window.innerWidth;
+      
+      let currentX = x.get();
+      let currentY = y.get();
 
-      const mx = mousePos.current.x;
-      const my = mousePos.current.y;
-      const petCenterX = s.x + PET_WIDTH / 2;
-      const petCenterY = window.innerHeight - BOTTOM_OFFSET;
-      const dist = Math.sqrt((mx - petCenterX) ** 2 + (my - petCenterY) ** 2);
+      if (!isDraggingRef.current) {
+        // Apply Gravity if above ground (y < 0)
+        if (currentY < 0) {
+          // Horizontal in-air physics
+          currentX += s.vx;
+          s.vx *= 0.99; // Air friction
 
-      if (dist < FLEE_DISTANCE) {
-        s.isFleeing = true;
-        s.fleeTimer = 60;
-        const fleeDir = petCenterX > mx ? 1 : -1;
-        s.targetVx = fleeDir * FLEE_SPEED * Math.max(0.3, 1 - dist / FLEE_DISTANCE);
-      } else if (s.fleeTimer > 0) {
-        s.fleeTimer--;
-        if (s.fleeTimer <= 0) {
-          s.isFleeing = false;
+          // Bounce off walls horizontally
+          if (currentX <= 10) {
+            currentX = 10;
+            s.vx *= -0.8;
+          } else if (currentX >= screenW - PET_WIDTH - 10) {
+            currentX = screenW - PET_WIDTH - 10;
+            s.vx *= -0.8;
+          }
+          x.set(currentX);
+
+          // Vertical physics
+          s.vy += GRAVITY;
+          currentY += s.vy;
+          
+          if (currentY >= 0) {
+            currentY = 0;
+            s.vy = s.vy * BOUNCE;
+            if (Math.abs(s.vy) < 1) {
+              s.vy = 0;
+            } else {
+               // Optional: trigger phrase on bounce?
+               if (Math.abs(s.vy) > 3 && Math.random() > 0.5) triggerPhrase("Ouch! 🤕");
+            }
+          }
+          y.set(currentY);
+          setIsWalking(false);
+        } else {
+          // On the ground, walk around
+          setIsWalking(true);
           s.targetVx = s.direction * WALK_SPEED;
+          s.vx += (s.targetVx - s.vx) * LERP;
+          currentX += s.vx;
+
+          if (currentX <= 10) {
+            currentX = 10;
+            s.direction = 1;
+            s.targetVx = WALK_SPEED;
+          } else if (currentX >= screenW - PET_WIDTH - 10) {
+            currentX = screenW - PET_WIDTH - 10;
+            s.direction = -1;
+            s.targetVx = -WALK_SPEED;
+          }
+          x.set(currentX);
         }
-      } else {
-        s.targetVx = s.direction * WALK_SPEED;
+        
+        setDirection(s.vx >= 0 ? 1 : -1);
       }
-
-      s.vx += (s.targetVx - s.vx) * (s.isFleeing ? 0.12 : LERP);
-      s.x += s.vx;
-
-      if (s.x <= 10) {
-        s.x = 10;
-        s.direction = 1;
-        s.targetVx = WALK_SPEED;
-      } else if (s.x >= screenW - PET_WIDTH - 10) {
-        s.x = screenW - PET_WIDTH - 10;
-        s.direction = -1;
-        s.targetVx = -WALK_SPEED;
-      }
-
-      const facing = s.vx >= 0 ? 1 : -1;
-
-      setPos({ x: s.x });
-      setDirection(facing);
-      setIsWalking(true);
-      setIsFleeing(s.isFleeing);
 
       animRef.current = requestAnimationFrame(animate);
     };
@@ -173,19 +199,41 @@ function Pet({ initialX, name, mousePos }) {
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [mousePos]);
+  }, [x, y]);
 
   return (
-    <div
+    <motion.div
       ref={petRef}
-      className={`pet-character ${isWalking ? "walking" : ""} ${isFleeing ? "running" : ""}`}
+      className={`pet-character ${isWalking && !isDragging ? "walking" : ""} ${isDragging ? "running" : ""}`}
       style={{
         position: "fixed",
         bottom: "24px",
-        left: `${pos.x}px`,
+        left: 0,
+        x,
+        y,
         zIndex: 9999,
-        pointerEvents: "none",
+        cursor: isDragging ? "grabbing" : "grab",
+        touchAction: "none"
       }}
+      drag
+      dragMomentum={false}
+      dragConstraints={{ left: 0, right: window.innerWidth - 64, top: -window.innerHeight + 100, bottom: 0 }}
+      dragElastic={0.2}
+      whileDrag={{ scale: 1.1 }}
+      onDragStart={() => {
+        isDraggingRef.current = true;
+        setIsDragging(true);
+        triggerPhrase("Wheee! 🎈");
+        stateRef.current.vy = 0;
+      }}
+      onDragEnd={(event, info) => {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+        // Throw momentum
+        stateRef.current.vx = info.velocity.x * 0.01;
+        stateRef.current.vy = info.velocity.y * 0.01;
+      }}
+      onClick={() => triggerPhrase("Yay! ✨")}
     >
       {/* Speech bubble */}
       {phrase && (
@@ -196,38 +244,29 @@ function Pet({ initialX, name, mousePos }) {
 
       {/* Character body */}
       <div className="pet-body">
-        <GeistSprite flipped={direction === -1} isFleeing={isFleeing} />
+        <GeistSprite flipped={direction === -1} isPanicked={isDragging || y.get() < -10} />
       </div>
 
       {/* Name tag */}
       <div className="pet-name">{name}</div>
-    </div>
+    </motion.div>
   );
 }
 
 // ── Main PetCharacters Component ─────────────────────────
 export default function PetCharacters() {
-  const mousePos = useRef({ x: -999, y: -999 });
-
-  useEffect(() => {
-    const handleMouse = (e) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener("mousemove", handleMouse, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouse);
-  }, []);
-
+  // Use state to track window size for dynamic constraints, 
+  // but for simplicity window.innerWidth on load inside the component works well enough
+  // since we constrain via framer-motion.
   return (
     <>
       <Pet
         initialX={100}
         name="Krisna"
-        mousePos={mousePos}
       />
       <Pet
-        initialX={window.innerWidth - 200}
+        initialX={window.innerWidth > 600 ? window.innerWidth - 200 : 200}
         name="Udayana"
-        mousePos={mousePos}
       />
     </>
   );
