@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { FiDownload, FiAward, FiTerminal, FiCode, FiLayout, FiCpu } from "react-icons/fi";
+import { FiDownload, FiCode, FiLayout, FiCpu, FiStar } from "react-icons/fi";
 
 const TECH_STACK = {
   core: ["HTML5", "CSS3", "PHP", "Java", "JavaScript", "SQL"],
@@ -10,145 +10,146 @@ const TECH_STACK = {
 };
 
 export default function About() {
-  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
+  const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  const fadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   return (
-    <section id="about" className="relative w-full bg-[#f4f4f5] py-6 px-4 md:px-8 border-t-[3px] border-black min-h-screen flex items-center">
-      {/* Container */}
+    <section id="about" className="relative w-full bg-[#f4f4f5] py-20 px-4 md:px-8 border-t-[3px] border-black min-h-screen flex items-center overflow-hidden">
+      
+      {/* Background Decorative Elements */}
+      <div className="absolute top-10 left-10 text-gray-300 pointer-events-none">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+        </svg>
+      </div>
+
       <div className="max-w-7xl mx-auto w-full" ref={ref}>
-        <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-4" variants={containerVariants} initial="hidden" animate={inView ? "visible" : "hidden"}>
-          {/* Intro Card (Spans 2 cols) */}
-          <motion.div variants={itemVariants} className="md:col-span-2 border-[3px] border-black rounded-[24px] bg-white p-6 shadow-[6px_6px_0_#111]">
-            <h2 className="text-2xl md:text-3xl font-black text-black mb-3 tracking-tight uppercase">Hi, I'm Krisna Udayana.</h2>
-            <p className="text-sm md:text-base text-gray-700 font-medium leading-relaxed mb-2">
-              A Junior Web Developer with a degree in Information Systems. I specialize in analyzing requirements and designing system flows to build iterative web solutions.
-            </p>
-            <p className="text-sm md:text-base text-gray-700 font-medium leading-relaxed mb-5">
-              Experienced in leading development lifecycles (from design to deployment) for organizational projects, prioritizing data accuracy, performance, and code quality.
-            </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 px-6 py-2.5 border-[3px] border-black rounded-full bg-black text-white font-extrabold text-xs shadow-[4px_4px_0_#111] hover:shadow-[6px_6px_0_#111] hover:-translate-y-1 transition-all uppercase tracking-wide"
-            >
-              <FiDownload size={15} />
-              Download Resume
-            </a>
-          </motion.div>
+        <div className="flex flex-col lg:flex-row gap-12 items-center lg:items-stretch">
+          
+          {/* LEFT: ID BADGE (Polaroid Style) */}
+          <motion.div 
+            className="w-full lg:w-[380px] flex-shrink-0"
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+          >
+            <div className="group relative bg-white border-[3px] border-black p-5 rounded-[2px] shadow-[8px_8px_0_#111] rotate-[-2deg] hover:rotate-0 transition-transform duration-300">
+              
+              {/* Tape effect */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 bg-white/60 border-2 border-gray-300 backdrop-blur-sm rotate-3 z-10"></div>
 
-          {/* Profile Card (Spans 1 col) */}
-          <motion.div variants={itemVariants} className="border-[3px] border-black rounded-[24px] bg-white p-3 shadow-[6px_6px_0_#111] flex flex-col items-center justify-center relative overflow-hidden group min-h-[200px]">
-            <div className="w-full h-full bg-gray-200 rounded-[18px] overflow-hidden relative border-2 border-dashed border-gray-400 flex items-center justify-center">
-              <span className="text-gray-400 font-bold uppercase tracking-widest text-xs">Profile Photo</span>
-              <img src="https://via.placeholder.com/400x500/111/fff?text=Foto" alt="Krisna Udayana" className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 opacity-0" />
-              <div className="absolute bottom-3 left-3 right-3 z-20">
-                <div className="flex items-center justify-between p-2.5 bg-black/80 backdrop-blur-md border-2 border-white/20 rounded-xl">
+              {/* Photo Area */}
+              <div className="relative w-full aspect-[4/5] bg-gray-200 border-[3px] border-black mb-5 overflow-hidden flex items-center justify-center">
+                <span className="font-bold text-gray-400 tracking-widest uppercase text-sm">Insert Photo</span>
+                <img 
+                  src="https://via.placeholder.com/400x500/111/fff?text=Foto" 
+                  alt="Krisna Udayana" 
+                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 opacity-0" 
+                />
+                
+                {/* Online Status Pill */}
+                <div className="absolute top-3 right-3 bg-white border-2 border-black px-2 py-1 flex items-center gap-2 shadow-[2px_2px_0_#111] rotate-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse border border-black"></div>
+                  <span className="text-[10px] font-black uppercase tracking-wider">Online</span>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-black uppercase tracking-tight text-black mb-1">Krisna Udayana</h2>
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Junior Web Developer</p>
+              </div>
+
+              {/* Education & Action */}
+              <div className="border-t-[3px] border-black pt-4">
+                <div className="flex justify-between items-center mb-4">
                   <div>
-                    <p className="text-white font-bold text-xs">@krisna</p>
-                    <p className="text-green-400 font-bold text-[9px] tracking-widest uppercase flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                      Online
-                    </p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Education</p>
+                    <p className="text-xs font-black uppercase">Information Systems</p>
                   </div>
-                  <button className="px-3 py-1 bg-white text-black font-bold text-[10px] rounded-full hover:bg-gray-200 transition-colors">Hire Me</button>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">GPA</p>
+                    <p className="text-lg font-black leading-none">3.81</p>
+                  </div>
                 </div>
+                
+                <a
+                  href="#"
+                  className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-[#111] text-white border-[3px] border-black font-black uppercase tracking-wider text-sm shadow-[4px_4px_0_#111] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+                >
+                  <FiDownload size={18} />
+                  Grab Resume
+                </a>
               </div>
             </div>
           </motion.div>
 
-          {/* Education Card (Spans 1 col) */}
-          <motion.div variants={itemVariants} className="border-[3px] border-black rounded-[24px] bg-white p-6 shadow-[6px_6px_0_#111] flex flex-col justify-between">
-            <div>
-              <div className="w-10 h-10 rounded-full border-[3px] border-black flex items-center justify-center mb-4">
-                <FiAward size={17} className="text-black" />
-              </div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-0.5">Universitas ...</p>
-              <h3 className="text-lg font-black uppercase mb-4 tracking-tight">Information Systems</h3>
+          {/* RIGHT: TYPOGRAPHY & STORY */}
+          <motion.div 
+            className="w-full flex-1 flex flex-col justify-center"
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+          >
+            {/* Giant Heading */}
+            <h2 className="text-4xl md:text-6xl font-black uppercase leading-[0.95] tracking-tighter mb-8 text-black">
+              I analyze requirements & design <span className="inline-block bg-[#18d66b] text-black px-3 py-1 border-[3px] border-black shadow-[4px_4px_0_#111] -rotate-2 my-2">System Flows</span> to build better web experiences.
+            </h2>
 
-              <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Relevant Coursework:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Web Programming", "Database Systems", "Software Engineering", "OOP", "System Analysis"].map((course) => (
-                    <span key={course} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-bold uppercase rounded-md border border-gray-200">
-                      {course}
-                    </span>
-                  ))}
+            {/* Narrative */}
+            <div className="border-l-[6px] border-black pl-5 mb-10 max-w-2xl">
+              <p className="text-lg md:text-xl text-gray-800 font-medium leading-relaxed">
+                Experienced in leading development lifecycles—from initial design to final deployment. 
+                I prioritize data accuracy, high performance, and writing clean, iterative code that makes sense for organizations.
+              </p>
+            </div>
+
+            {/* Arsenal / Tech Stack */}
+            <div className="bg-[#eef3f6] border-[3px] border-black p-6 md:p-8 shadow-[8px_8px_0_#111]">
+              <div className="flex items-center gap-3 mb-6">
+                <FiStar size={24} className="text-[#d49a20] fill-[#d49a20]" />
+                <h3 className="text-2xl font-black uppercase tracking-tight">The Arsenal</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Core */}
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2"><FiCode /> Core</p>
+                  <div className="flex flex-wrap gap-2">
+                    {TECH_STACK.core.map(tech => (
+                      <span key={tech} className="bg-white border-2 border-black px-2.5 py-1 text-xs font-bold uppercase shadow-[2px_2px_0_#111]">{tech}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Frameworks */}
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2"><FiLayout /> Frameworks</p>
+                  <div className="flex flex-wrap gap-2">
+                    {TECH_STACK.frameworks.map(tech => (
+                      <span key={tech} className="bg-[#111] text-white border-2 border-black px-2.5 py-1 text-xs font-bold uppercase shadow-[2px_2px_0_#111]">{tech}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tools */}
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2"><FiCpu /> Tools</p>
+                  <div className="flex flex-wrap gap-2">
+                    {TECH_STACK.tools.map(tech => (
+                      <span key={tech} className="bg-white border-2 border-black px-2.5 py-1 text-xs font-bold uppercase shadow-[2px_2px_0_#111]">{tech}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-4 border-t-2 border-gray-100 flex items-end gap-2">
-              <span className="text-4xl font-black leading-none tracking-tighter">3.81</span>
-              <div className="pb-0.5">
-                <p className="text-blue-600 font-bold text-[10px] uppercase tracking-wider leading-tight">Highly Satisfactory</p>
-                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider leading-tight">/ 4.00 GPA</p>
-              </div>
-            </div>
           </motion.div>
-
-          {/* Tech Stack Card (Spans 2 cols) */}
-          <motion.div variants={itemVariants} className="md:col-span-2 border-[3px] border-black rounded-[24px] bg-white p-6 shadow-[6px_6px_0_#111]">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b-2 border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center shadow-[3px_3px_0_rgba(0,0,0,0.2)]">
-                <FiTerminal size={20} />
-              </div>
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">Tech Stack</h2>
-            </div>
-
-            <div className="space-y-4">
-              {/* Core Languages */}
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Core Languages</p>
-                <div className="flex flex-wrap gap-2">
-                  {TECH_STACK.core.map((tech) => (
-                    <div key={tech} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-xs text-gray-700 hover:border-black transition-colors cursor-default">
-                      <FiCode size={12} className="text-gray-500" />
-                      {tech}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Frameworks & UI */}
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Frameworks & UI</p>
-                <div className="flex flex-wrap gap-2">
-                  {TECH_STACK.frameworks.map((tech) => (
-                    <div key={tech} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-xs text-gray-700 hover:border-black transition-colors cursor-default">
-                      <FiLayout size={12} className="text-gray-500" />
-                      {tech}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tools & Ecosystem */}
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Tools & Ecosystem</p>
-                <div className="flex flex-wrap gap-2">
-                  {TECH_STACK.tools.map((tech) => (
-                    <div key={tech} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-xs text-gray-700 hover:border-black transition-colors cursor-default">
-                      <FiCpu size={12} className="text-gray-500" />
-                      {tech}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
